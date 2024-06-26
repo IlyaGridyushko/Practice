@@ -71,7 +71,11 @@ bool check_structure(const json& data, const json& template_json) {
             if(data.size()!= template_json.size()){
                 return false;
             }
-            return check_structure(data[0], template_json[0]);
+            for(int i=0; i<data.size(); i++){
+                if(!check_structure(data[i], template_json[i])){
+                    return false;
+                }
+            }
         }
     }
 
@@ -80,7 +84,7 @@ bool check_structure(const json& data, const json& template_json) {
 int main(int argc, char *argv[]){
     try{
         CheckArgumentsAmount(argc);
-        CheckInputPath(argv[argc - 1]);
+        CheckInputPath(fs::path(argv[argc - 1]));
         json template_json = R"({
             "string_0" : "some string",
             "number" : 10,
