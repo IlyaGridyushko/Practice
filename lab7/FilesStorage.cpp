@@ -8,6 +8,9 @@ std::string ReadFileContent(const fs::path& path_to_file) {
     if (!fs::exists(path_to_file)) {
         throw std::invalid_argument("Filesystem object by path " + path_to_file.string() + " is not exists!");
     }
+    if(!fs::is_regular_file(path_to_file)){
+        throw std::invalid_argument("Filesystem object by path " + path_to_file.string() + " is not regular file!");
+    }
     std::ifstream file(path_to_file, std::ios::binary);
     if (!file.is_open()) {
         throw std::runtime_error("File by path " + path_to_file.string() + " hasn’t been opened!");

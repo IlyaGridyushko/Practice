@@ -10,8 +10,8 @@
 namespace fs = std::filesystem;
 
 void CheckArgumentsAmount(int arguments_amount){
-    if(arguments_amount != 3){
-        throw std::invalid_argument("Invalid command line arguments amount: \ncurrent - " + std::to_string(arguments_amount) + "\nrequired - 3");
+    if(arguments_amount != 2){
+        throw std::invalid_argument("Invalid command line arguments amount: \ncurrent - " + std::to_string(arguments_amount) + "\nrequired - 2");
     }
 }
 
@@ -47,40 +47,38 @@ std::string ReadFileContent(const fs::path& path_to_file) {
     return content;
 }
 
-std::set<std::string> GetFilesContentFromDirectory ( fs::path& path_to_directory){
-    std::set<std::string> files_contents;
-    
-    for(const auto& entry: fs::directory_iterator(path_to_directory)){
+std::size_t GetFileContentHash (const fs::path& path_to_file){
+    std::string content = ReadFileContent(path_to_file);
+    return std::hash<std::string>{}(content);
+}
+
+void RemoveDuplicatesFromDirectory(const fs::path& path_to_directory){
+    std::set<std::size_t> hash_set;
+    if(!fs::is_directory( path_to_directory)){
+        throw std::invalid_argument("Is not a directory:: " +  path_to_directory.string());
+    }
+    for(const auto & entry : fs::directory_iterator(path_to_directory)){
+        if(fs::is_directory(entry.path())){
+            continue;
+        }
         if(!fs::exists(entry.path())){
             throw std::invalid_argument("Filesystem object by path " + entry.path().string() + " is not exists!");
         }
-        if(fs::is_directory(entry.path())){
-            continue;  
+        std::size_t hash = GetFileContentHash(entry.path());
+        if(hash_set.find(hash) == hash_set.end()){
+            hash_set.insert(hash);
+        }else{
+            fs::remove(entry.path());
         }
-        if(fs::is_regular_file(entry.path())){
-            files_contents.insert(ReadFileContent(entry.path()));
-        }   
     }
-    return files_contents;
 }
 
 int main(int argc, char *argv[]){
     try{
         CheckArgumentsAmount(argc);
         CheckInputPath(fs::path(argv[argc - 1]));
-        CheckInputPath(fs::path(argv[argc - 2]));
-        fs::path directory_in = fs::path(argv[argc - 1]);
-        fs::path directory_out = fs::path(argv[argc - 2]);
-        std::set<std::string> files_content = GetFilesContentFromDirectory(directory_out);
-        for(const auto& entry: fs::directory_iterator(directory_in)){
-            const auto path_in_dir_out = fs::path(directory_out.string())  /  entry.path();
-            std::string content = ReadFileContent(entry.path());
-            if(files_content.find(content) == files_content.end()){
-                fs::copy_file(entry.path(), path_in_dir_out, fs::copy_options::overwrite_existing);
-                std::cout << "File " << entry.path().filename().string() << " is in " << path_in_dir_out.string() << std::endl;
-                files_content.insert(content);
-            }
-        }
+        fs::path directory = fs::path(argv[argc - 1]);
+        RemoveDuplicatesFromDirectory(directory);
     }
     catch(std::exception& e){
         std::cerr << "Error: " << e.what() << std::endl;
