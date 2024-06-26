@@ -26,25 +26,29 @@ void CheckInputPath (const fs::path& path_to_filesystem_object){
 }
 
 std::string ReadFileContent(const fs::path& path_to_file) {
-    if (!fs::exists(path_to_file)) {
-        throw std::invalid_argument("Filesystem object by path " + path_to_file.string() + " is not exists!");
+    try{
+        if (!fs::exists(path_to_file)) {
+            throw std::invalid_argument("Filesystem object by path " + path_to_file.string() + " is not exists!");
+        }
+        if(!fs::is_regular_file(path_to_file)){
+            throw std::invalid_argument("Filesystem object by path " + path_to_file.string() + " is not regular file!");
+        }
+        std::ifstream file(path_to_file, std::ios::binary);
+        if (!file.is_open()) {
+            throw std::runtime_error("File by path " + path_to_file.string() + " hasn’t been opened!");
+        }
+        file.seekg(0, std::ios::end);
+        std::streamsize size = file.tellg();
+        file.seekg(0, std::ios::beg);
+        std::string content(static_cast<size_t>(size), '\0');
+        if (!file.read(content.data(), size)) {
+            throw std::runtime_error("Error reading file content!");
+        }
+        return content;
     }
-    if(!fs::is_regular_file(path_to_file)){
-        throw std::invalid_argument("Filesystem object by path " + path_to_file.string() + " is not regular file!");
+    catch(std::exception& e){
+        throw std::runtime_error("Cant read file content: "+ path_to_file.string() + e.what());
     }
-    std::ifstream file(path_to_file, std::ios::binary);
-    if (!file.is_open()) {
-        throw std::runtime_error("File by path " + path_to_file.string() + " hasn’t been opened!");
-    }
-    file.seekg(0, std::ios::end);
-    std::streamsize size = file.tellg();
-    file.seekg(0, std::ios::beg);
-    std::string content(static_cast<size_t>(size), '\0');
-    if (!file.read(content.data(), size)) {
-        throw std::runtime_error("Error reading file content!");
-    }
-
-    return content;
 }
 
 std::size_t GetFileContentHash (const fs::path& path_to_file){
