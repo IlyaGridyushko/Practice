@@ -9,7 +9,7 @@
 #include <fstream>
 #include <vector>
 #include <set>
-#include <chrono>
+#include "FileName.H"
 
 namespace fs = std::filesystem;
 
@@ -47,41 +47,14 @@ void CheckIfFileInDirectory(const fs::path& path_to_file, const fs::path& path_t
     }
 }
 
-bool is_valid_date(int year, int month, int day) {
-    try{
-        if (month < 1 || month > 12 || day < 1) {
-            return false;
-        }
-        std::chrono::year y{year};
-        std::chrono::month m{month};
-        std::chrono::day d{day};  
-        std::chrono::year_month_day date{y / m / d};
-        return date.ok();
-    }catch(...){
-        return false;
-    }
-}
+
 
 std::filesystem::path GetPathToMove(const fs::path& path_to_file){
-    std::string file_name_without_extension = path_to_file.filename().stem().string();
-    char delemitr = '_';
-    std::vector<std::string> splitted_file_name;
-    while(file_name_without_extension.find(delemitr)!= std::string::npos){
-        std::size_t pos = file_name_without_extension.find(delemitr);
-        std::string token = file_name_without_extension.substr(0, pos);
-        splitted_file_name.push_back(token);
-        file_name_without_extension.erase(0, pos + 1);
-    }
-    splitted_file_name.push_back(file_name_without_extension);
-    if((splitted_file_name.size() != 4) ||
-       (!is_valid_date(std::stoi(splitted_file_name[0]), std::stoi(splitted_file_name[1]), std::stoi(splitted_file_name[2]))) ||
-       (splitted_file_name[1].size()!= 2) ||
-       (splitted_file_name[2].size()!= 2)){
-        throw std::invalid_argument("Invalid file format: " + path_to_file.string());
-    }
-    return path_to_file.parent_path() / fs::path(splitted_file_name[0])  /
-    fs::path(splitted_file_name[1])   / fs::path(splitted_file_name[2])  / 
-    fs::path(splitted_file_name[3] + path_to_file.extension().string());
+    FileName file_name(path_to_file.filename().string());
+    file_name.Parse();
+    return path_to_file.parent_path() / fs::path(std::to_string(file_name.year)) /
+        fs::path(std::to_string(file_name.month)) / fs::path(std::to_string(file_name.day)) / 
+        fs::path(file_name.only_name + path_to_file.extension().string());
 }
 
 void Move(const fs::path& path_to_file){
@@ -104,10 +77,26 @@ int main(int argc, char *argv[]){
             CheckInputFilePath(directory / fs::path(argv[i]));
             CheckIfFileInDirectory(fs::path(argv[i]), directory);
         }
-        for(int i = 2;i < argc;i++){
-            Move(directory / fs::path(argv[i]));
+        
+        for(const auto& entry : fs::directory_iterator(directory)){
+            if(!fs::exists(entry.path())){
+                throw std::runtime_error("File " + entry.path().filename().string() + " does not exists");
+            }
+            if(fs::is_regular_file(entry.path())){
+                FileName file_name(entry.path().filename());
+                file_name.Parse();
+                if(file_name.IsRemoveRequired()){
+                    fs::remove(entry.path());
+                    std::cout << "File " + entry.path().filename().string() + " was removed successfully" << std::endl;
+                }
+            }
         }
+        for(int i = 2;i < argc;i++){
+            if(fs::exists(directory / fs::path(argv[i]))){
+                Move(directory / fs::path(argv[i]));
+            }
         return 0;
+        }
     }
     catch(std::exception& e){
         std::cerr << "Error: " << e.what() << std::endl;

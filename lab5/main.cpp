@@ -118,8 +118,8 @@ namespace directory_content{
 int main(int argc, char *argv[]){
     try{
         CheckArgumentsAmount(argc);
-        CheckInputPath(fs::path(argv[argc - 1]));
-        fs::path path = fs::path(argv[argc - 1]);
+        CheckInputPath(fs::path(argv[1]));
+        fs::path path = fs::path(argv[1]);
         filesystem_object::Info info(path);
         directory_content::Info info_directory(path);
         std::cout << info << '\n';

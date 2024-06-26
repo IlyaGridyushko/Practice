@@ -69,8 +69,8 @@ int main(int argc, char *argv[]){
         CheckArgumentsAmount(argc);
         CheckInputPath(fs::path(argv[argc - 1]));
         CheckInputPath(fs::path(argv[argc - 2]));
-        fs::path directory_in = fs::path(argv[argc - 1]);
-        fs::path directory_out = fs::path(argv[argc - 2]);
+        fs::path directory_in = fs::path(argv[argc - 2]);
+        fs::path directory_out = fs::path(argv[argc - 1]);
         std::set<std::string> files_content = GetFilesContentFromDirectory(directory_out);
         for(const auto& entry: fs::directory_iterator(directory_in)){
             const auto path_in_dir_out = fs::path(directory_out.string())  /  entry.path();

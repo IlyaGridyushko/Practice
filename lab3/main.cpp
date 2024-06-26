@@ -100,8 +100,8 @@ int main(int argc, char *argv[]){
             output_file << required_time_json.dump(4);
             output_file.close();
         }else{
-            CheckInputPath(fs::path(argv[argc - 1]));
-            std::ifstream file(argv[argc - 1]);
+            CheckInputPath(fs::path(argv[1]));
+            std::ifstream file(argv[1]);
             json data =  json::parse(file);
             tm current_time = JsonToTm(data);
             tm required_time = GetRequiredDateTime(&current_time);

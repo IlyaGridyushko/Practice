@@ -80,9 +80,9 @@ json GetFileInfo (const fs::path& path_to_file){
 int main(int argc, char *argv[]){
     try{
         CheckArgumentsAmount(argc);
-        CheckInputPath(fs::path(argv[argc - 1]));
+        CheckInputPath(fs::path(argv[1]));
         
-        json info = GetFileInfo(fs::path(argv[argc - 1]));
+        json info = GetFileInfo(fs::path(argv[1]));
         std::cout << info.dump(4) << std::endl;
         std::ofstream out("info.json");
         out << info.dump(4);

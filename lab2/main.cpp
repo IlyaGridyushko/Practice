@@ -58,9 +58,9 @@ void ModifyJsonObject(json& json_object){
 int main(int argc, char *argv[]){
     try{
         CheckArgumentsAmount(argc);
-        CheckInputPath(fs::path(argv[argc - 1]));
+        CheckInputPath(fs::path(argv[1]));
 
-        std::ifstream file(argv[argc - 1]);
+        std::ifstream file(argv[1]);
 
         json data =  json::parse(file);
 

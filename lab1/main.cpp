@@ -84,7 +84,7 @@ bool check_structure(const json& data, const json& template_json) {
 int main(int argc, char *argv[]){
     try{
         CheckArgumentsAmount(argc);
-        CheckInputPath(fs::path(argv[argc - 1]));
+        CheckInputPath(fs::path(argv[1]));
         json template_json = R"({
             "string_0" : "some string",
             "number" : 10,

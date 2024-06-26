@@ -32,8 +32,8 @@ int main(int argc, char *argv[]){
         CheckArgumentsAmount(argc);
         CheckInputPath(fs::path(argv[argc - 1]));
         CheckInputPath(fs::path(argv[argc - 2]));
-        fs::path directory_in = fs::path(argv[argc - 1]);
-        fs::path directory_out = fs::path(argv[argc - 2]);
+        fs::path directory_in = fs::path(argv[argc - 2]);
+        fs::path directory_out = fs::path(argv[argc - 1]);
         FilesStorage storage(directory_out);
         storage.InitStorage();
         for(const auto entry : fs::directory_iterator(directory_in)){
