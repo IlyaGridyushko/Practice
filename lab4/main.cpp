@@ -6,14 +6,6 @@
 #include <filesystem>
 #include <fstream>
 #include <vector>
-#include <time.h>
-#include <ctime>
-//variant 4
-/*
-    Given task: 
-    Получить значения даты и времени, соответствующих концу
-    прошлого года (23:59:59 31 декабря)
-*/
 
 namespace fs = std::filesystem;
 using json = nlohmann::json;
