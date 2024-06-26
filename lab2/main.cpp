@@ -35,7 +35,7 @@ void CheckInputPath (const fs::path& path_to_filesystem_object){
     }
 }
 
-void ModifyJsonObject(nlohmann::json& json_object){
+void ModifyJsonObject(json& json_object){
     std::vector<std::string> keys_to_remove;
 
     for(const auto& item: json_object.items()){

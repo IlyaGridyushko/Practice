@@ -1,5 +1,4 @@
 #include <iostream>
-#include "json.hpp"
 #include <exception>
 #include <stdexcept>
 #include <string>
@@ -8,7 +7,6 @@
 #include <vector>
 
 namespace fs = std::filesystem;
-using json = nlohmann::json;
 
 void CheckArgumentsAmount(int arguments_amount){
     if(arguments_amount != 2){
@@ -42,6 +40,7 @@ std::size_t Size (const fs::path& path_to_filesystem_object){
         }
         return size;
     }
+    return 0;
 }
 
 namespace filesystem_object {
