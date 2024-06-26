@@ -78,25 +78,31 @@ bool check_structure(const json& data, const json& template_json) {
     return true;
 }
 int main(int argc, char *argv[]){
-    CheckArgumentsAmount(argc);
-    CheckInputPath(argv[1]);
-    json template_json = R"({
-        "string_0" : "some string",
-        "number" : 10,
-        "object" : {
-            "boolean" : true,
-            "array" : []
-        },
-        "string_1" : null,
-        "array" : null
-        })"_json;
-    std::ifstream file(argv[1]);
-    json data =  json::parse(file);
+    try{
+        CheckArgumentsAmount(argc);
+        CheckInputPath(argv[argc - 1]);
+        json template_json = R"({
+            "string_0" : "some string",
+            "number" : 10,
+            "object" : {
+                "boolean" : true,
+                "array" : []
+            },
+            "string_1" : null,
+            "array" : null
+            })"_json;
+        std::ifstream file(argv[argc - 1]);
+        json data =  json::parse(file);
 
-    if(check_structure(data, template_json)){
-        std::cout << "Structure is correct" << std::endl;
-    }else{
-        std::cout << "Structure is not correct" << std::endl;
+        if(check_structure(data, template_json)){
+            std::cout << "Structure is correct" << std::endl;
+        }else{
+            std::cout << "Structure is not correct" << std::endl;
+        }
+        
+    }catch(const std::exception& e){
+        std::cerr<< "Error: " << e.what() << std::endl;
+        return 1;
     }
     
     return 0;

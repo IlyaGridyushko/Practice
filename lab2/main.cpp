@@ -56,20 +56,26 @@ void ModifyJsonObject(nlohmann::json& json_object){
 }
 
 int main(int argc, char *argv[]){
-    CheckArgumentsAmount(argc);
-    CheckInputPath(argv[1]);
-    
-    std::ifstream file(argv[1]);
+    try{
+        CheckArgumentsAmount(argc);
+        CheckInputPath(argv[argc - 1]);
 
-    json data =  json::parse(file);
+        std::ifstream file(argv[argc - 1]);
 
-    ModifyJsonObject(data);
-    
-    for(const auto& item: data.items()){
-        std::ofstream output_file(item.key() + ".json");
-        output_file << item.value().dump(4);
-        output_file.close();
+        json data =  json::parse(file);
+
+        ModifyJsonObject(data);
+
+        for(const auto& item: data.items()){
+            std::ofstream output_file(item.key() + ".json");
+            output_file << item.value().dump(4);
+            output_file.close();
+        }
+    }catch(std::exception& e){
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
     }
+
     return 0;
 }
 
